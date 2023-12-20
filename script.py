@@ -75,24 +75,21 @@ class Review:
     def increase_list(self):
         self.total_lists += 1
 
-print("    ┌⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑┐   ")
-print("    | ┌ - - - - - - - - - - - - ┐ |   ")
-print("    | | * *        *        * * | |   ")
-print("    | | *    W E L C O M E    * | |   ")
-print("    | |           T O           | |   ")
-print("    | |        M O V I E        | |   ")
-print("    | | *     R E V I E W     * | |   ")
-print("    | | * *        *        * * | |   ")
-print("    | └ - - - - - - - - - - - - ┘ |   ")
-print("    └-----------------------------┘   ")
-print("  /     ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒     \ ")
-print("/     ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒     ")
-print("    ⌒ ⌒ B Y ⌒ C A N V A S S P O T S   ")
-print("  ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ")
-
-def exit():
-    print("\nThank you for using Movie Reviews, the movie review searching database.")
-    print("Please return soon!")
+def welcome():
+    print("    ┌⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑-⏑┐   ")
+    print("    | ┌ - - - - - - - - - - - - ┐ |   ")
+    print("    | | * *        *        * * | |   ")
+    print("    | | *    W E L C O M E    * | |   ")
+    print("    | |           T O           | |   ")
+    print("    | |        M O V I E        | |   ")
+    print("    | | *     R E V I E W     * | |   ")
+    print("    | | * *        *        * * | |   ")
+    print("    | └ - - - - - - - - - - - - ┘ |   ")
+    print("    └-----------------------------┘   ")
+    print("  /     ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒     \ ")
+    print("/     ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒     ")
+    print("    ⌒ ⌒ B Y ⌒ C A N V A S S P O T S   ")
+    print("  ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ⌒ ")
 
 def insert_sorting_categories(type):
     # Creates a category linked list to be searched through based on the category types.
@@ -102,30 +99,67 @@ def insert_sorting_categories(type):
         category_list.add_to_tail(category)
     return category_list, categories
 
-def insert_movie_reviews(type, categories):
+def insert_movie_reviews(type, categories, sort_method):
     # Creates a linked list for each category and adds all corresponding movie review linked sublist.
     movie_reviews = open_movies()
     movie_review_list = {}
-    movie_list = {}
+    movie_dict = {}
     for category in categories:
         movie_child_list = DoublyLinkedList()
         for review in movie_reviews:
+            # This part checks if there's an existing review already created. Reviews are classes that have been saved to a dictionary. The key to the dictionary is the movie's title plus release date, both of which can be easily looked through. If not, a new review is made. 
+            review_key = review[movie_tags[0]] + " " + review[movie_tags[1]]
+            if review_key not in movie_dict.keys():
+                movie_review = Review(review[movie_tags[0]], review[movie_tags[1]], review[movie_tags[2]], review[movie_tags[3]], review[movie_tags[4]], review[movie_tags[5]])
+                movie_dict[review_key] = movie_review
+
+            #The review is the added as a node to the linked list item.
             if category in review[type]:
-                # This part checks if there's an existing review already created. Reviews are classes that have been saved to a dictionary. The key to the dictionary is the movie's release date and the movie's title, both of which can be easily looked through. If not, a new review is made. The review is the added as a node to the linked list item.
-                review_key = review[movie_tags[1]] + " " + review[movie_tags[0]]
-                if review_key not in movie_list.keys():
-                    movie_review = Review(review[movie_tags[0]], review[movie_tags[1]], review[movie_tags[2]], review[movie_tags[3]], review[movie_tags[4]], review[movie_tags[5]])
-                    movie_list[review_key] = movie_review
-                movie_list[review_key].increase_list()
-                movie_child_list.add_to_tail(movie_list[review_key])
-        movie_review_list[category] = movie_child_list
+                movie_dict[review_key].increase_list()
+                movie_child_list.add_to_head(movie_dict[review_key])
+        movie_review_list[category] = movie_sort(movie_dict, movie_child_list, sort_method)
 
     return movie_review_list
 
-def select_category_type(type='Genre'):
+def movie_sort(dict, linkedlist, sort_method):
+    # Creates a sorted list by the sorting method, then sorts that list.
+    sort_list = []
+    for key in dict.keys():
+        if sort_method == "Alphabetical":
+            sort_list.append(dict[key].title)
+        elif sort_method == "Rating":
+            sort_list.append(str(6 - dict[key].rating) + dict[key].title)
+        elif sort_method == "Release Date":
+            sort_list.append(dict[key].release_date)
+    sort_list = sorted(sort_list)
+
+    # Sorts the linked list based on the above values.
+    sorted_linkedlist = DoublyLinkedList()
+    for sorted_item in sort_list:
+        linkedlist_head = linkedlist.get_head_node()
+        while linkedlist_head is not None:
+            movie_class = linkedlist_head.get_value()
+            if sort_method == "Alphabetical":
+                class_order = movie_class.title
+            elif sort_method == "Rating":
+                class_order = str(6 - movie_class.rating) + movie_class.title
+            elif sort_method == "Release Date":
+                class_order = movie_class.release_date
+            
+            # Steps up the linkedlist head here because in the next part, if they match it is removed.
+            linkedlist_head = linkedlist_head.get_next_node() 
+
+            if class_order == sorted_item:
+                linkedlist.remove_head()
+                sorted_linkedlist.add_to_tail(movie_class)
+    
+    # Returns the sorted linked list to the categories.
+    return sorted_linkedlist
+
+def select_category_type(type, sort_method):
     category_type = type
     category_list, categories = insert_sorting_categories(category_type)
-    movie_review_list = insert_movie_reviews(type, categories)
+    movie_review_list = insert_movie_reviews(type, categories, sort_method)
     return category_list, categories, movie_review_list
 
 def input_check(question):
@@ -134,9 +168,10 @@ def input_check(question):
         user_input = input(question).lower()
     return user_input
 
-category_type = 'Genre'
+welcome()
+category_type, sort_method = 'Genre', 'Rating'
 tips = True
-cat_list, cats, movie_list = select_category_type(category_type)
+cat_list, cats, movie_list = select_category_type(category_type, sort_method)
 
 sel_cat = ""
 while len(sel_cat) == 0:
@@ -144,29 +179,44 @@ while len(sel_cat) == 0:
     search_question = "\nWhat {type} of movie are you thinking of watching??\n".format(type=category_type.lower())
     if tips:
         tips = False
-        search_question += """
-Type the beginning of the {type} and press enter to see if it's here. You can also enter:
-    '/add' to add a movie to the review list.
-    '/change' to change the category types.
-    '/print' to print the category types.
-    '/exit' to exit out of this program. 
-""".format(type=category_type.lower())
+        search_question += "\nType the beginning of the {type} and press enter to see if it's here. You can also enter '/' to see additional options available.\n".format(type=category_type.lower())
     search_question += "\nChoose wisely: "
     user_input = input_check(search_question)
 
     # This first section checks if the user input is a user command before searching thru the category list.
     if user_input[0] == "/": 
+        # Displays the different user command options.
+        if user_input == "/":
+            print("\nThe following additional options are available:")
+            print("    '/add' to add a movie to the review list.")
+            print("    '/change_sort' to change the sorting method.")
+            print("    '/change_type' to change the category types.")
+            print("    '/print' to print the category types.")
+            print("    '/exit' to exit out of this program. ")
         # Allows the user to add a new movie title to the review section. This bit of code was created because I was adding my own reviews and it takes a lot more time to enter them into the movies.csv and check against the sorting.csv.
-        if "/add".startswith(user_input.lower()):
+        elif "/add".startswith(user_input.lower()):
             print('\nAdd new movie review selected.')
             add_movie()
 
+        # Checks if they actually picked what they would like to change.
+        elif "/change_".startswith(user_input.lower()):
+            print("I'm sorry, did you mean to change the sorting method or the type?")
+        
+        # Allows the user to change the movie display sorting method.
+        elif "/change_sort".startswith(user_input.lower()):
+            user_input = input_check("\nChange the recommendation sorting method selected.\nHow would you like to sort thru our movie database? You can say 'alphabetical' to sort each movie found alphabetically, or 'rating' to sort each movie found based on their rating, or 'release date' to sort each movie based on when they were released.\n\n")
+            possible_answers = ['alphabetical', 'rating', 'release_date']
+            if user_input in possible_answers:
+                sort_method = user_input.title()
+                cat_list, cats, movie_list = select_category_type(category_type, sort_method)
+
         # Allows the user to change the category sort type. Currently only genre and the release date work. I might add more later, like directors.
-        elif "/change".startswith(user_input.lower()):
+        elif "/change_type".startswith(user_input.lower()):
             user_input = input_check("\nChange category types selected.\nHow would you like to sort thru our movies?\nYou can say 'genre' to sort by genre, or 'release date' to sort by year the movie's were released. Say anything else to return to the previous menu.\n\n")
             possible_answers = ['genre', 'release date']
             if user_input in possible_answers:
-                cat_list, cats, movie_list = select_category_type(user_input.title())
+                category_type = user_input.title()
+                cat_list, cats, movie_list = select_category_type(category_type, sort_method)
             elif user_input == "/exit":
                 select_movie_category = user_input
 
@@ -178,7 +228,6 @@ Type the beginning of the {type} and press enter to see if it's here. You can al
         # I added in an exit so I could program different parts out of order (which meant I needed a quick way to leave). Can still be used by the user.
         elif "/exit".startswith(user_input.lower()):
             print("\nExit program selected.")
-            exit()
             sel_cat = user_input
     
     # If none of the above commands were input, the used will then begin searching the list for the category that begins with their text.
@@ -214,5 +263,6 @@ Type the beginning of the {type} and press enter to see if it's here. You can al
             user_input = input_check("Would you like to search the database again? ")
             if "yes".startswith(user_input):
                 sel_cat = ""
-            else:
-                exit()
+
+print("\nThank you for using Movie Reviews, the movie review searching database.")
+print("Please return soon!\n")
