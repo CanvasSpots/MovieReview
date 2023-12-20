@@ -104,6 +104,7 @@ def insert_movie_reviews(type, categories, sort_method):
     movie_reviews = open_movies()
     movie_review_list = {}
     movie_dict = {}
+    sorted_list = []
     for category in categories:
         movie_child_list = DoublyLinkedList()
         for review in movie_reviews:
@@ -112,17 +113,17 @@ def insert_movie_reviews(type, categories, sort_method):
             if review_key not in movie_dict.keys():
                 movie_review = Review(review[movie_tags[0]], review[movie_tags[1]], review[movie_tags[2]], review[movie_tags[3]], review[movie_tags[4]], review[movie_tags[5]])
                 movie_dict[review_key] = movie_review
+                sorted_list = update_sort_list(movie_dict, sort_method)
 
             #The review is the added as a node to the linked list item.
             if category in review[type]:
                 movie_dict[review_key].increase_list()
                 movie_child_list.add_to_head(movie_dict[review_key])
-        movie_review_list[category] = movie_sort(movie_dict, movie_child_list, sort_method)
+        movie_review_list[category] = movie_sort(movie_child_list, sorted_list, sort_method)
 
     return movie_review_list
 
-def movie_sort(dict, linkedlist, sort_method):
-    # Creates a sorted list by the sorting method, then sorts that list.
+def update_sort_list(dict, sort_method):
     sort_list = []
     for key in dict.keys():
         if sort_method == "Alphabetical":
@@ -132,7 +133,9 @@ def movie_sort(dict, linkedlist, sort_method):
         elif sort_method == "Release Date":
             sort_list.append(dict[key].release_date)
     sort_list = sorted(sort_list)
+    return sort_list
 
+def movie_sort(linkedlist, sort_list, sort_method):
     # Sorts the linked list based on the above values.
     sorted_linkedlist = DoublyLinkedList()
     for sorted_item in sort_list:
@@ -145,13 +148,12 @@ def movie_sort(dict, linkedlist, sort_method):
                 class_order = str(6 - movie_class.rating) + movie_class.title
             elif sort_method == "Release Date":
                 class_order = movie_class.release_date
-            
-            # Steps up the linkedlist head here because in the next part, if they match it is removed.
-            linkedlist_head = linkedlist_head.get_next_node() 
 
-            if class_order == sorted_item:
-                linkedlist.remove_head()
+            if sorted_item == class_order:
+                linkedlist.remove_node(linkedlist_head)
                 sorted_linkedlist.add_to_tail(movie_class)
+
+            linkedlist_head = linkedlist_head.get_next_node() 
     
     # Returns the sorted linked list to the categories.
     return sorted_linkedlist
