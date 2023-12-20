@@ -1,6 +1,5 @@
 from file_system import *
 from doublylinkedlist import *
-from node import *
 
 movie_tags = ['Title','Release Date', 'Genre', 'Director', 'IMDB Description', 'Rating']
 
