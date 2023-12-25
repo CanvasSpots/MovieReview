@@ -164,7 +164,6 @@ def select_category_type(type, sort_method):
     movie_review_list = insert_movie_reviews(type, categories, sort_method)
     return category_list, categories, movie_review_list
 
-def input_check(question):
     user_input = input(question).lower()
     while len(user_input) == 0:
         user_input = input(question).lower()
@@ -194,6 +193,7 @@ while len(sel_cat) == 0:
             print("    '/change_sort' to change the sorting method.")
             print("    '/change_type' to change the category types.")
             print("    '/print' to print the category types.")
+            print("    '/sort/ to sort the existing movie csv file.")
             print("    '/exit' to exit out of this program. ")
         # Allows the user to add a new movie title to the review section. This bit of code was created because I was adding my own reviews and it takes a lot more time to enter them into the movies.csv and check against the sorting.csv.
         elif "/add".startswith(user_input.lower()):
@@ -226,6 +226,11 @@ while len(sel_cat) == 0:
         elif "/print".startswith(user_input.lower()):
             print('\nPrint category types selected.')
             print(cats)
+
+        #
+        elif "/sort".startswith(user_input.lower()):
+            print("\nSorting movies.csv file by title.")
+            movie_file_sort()
 
         # I added in an exit so I could program different parts out of order (which meant I needed a quick way to leave). Can still be used by the user.
         elif "/exit".startswith(user_input.lower()):
